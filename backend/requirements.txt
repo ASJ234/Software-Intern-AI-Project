@@ -9,5 +9,4 @@ Pillow==10.1.0
 django-jazzmin==3.0.1
 whitenoise==6.7.0
 gunicorn==21.2.0
-blis==0.7.11
 
