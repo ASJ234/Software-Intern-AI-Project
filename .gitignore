@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+venv/
+.env
+.env.*
+
+# Django
+*.log
+staticfiles/
+media/
+
+# SQLite
+backend/db.sqlite3
+
+# Node
+frontend/node_modules/
+frontend/.env
+frontend/.env.*
+frontend/build/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Coverage / reports
+coverage/
+*.coverage
+pytest_cache/
+
+# Misc
+*.bak
+*.swp
