@@ -3,6 +3,13 @@
 ## Project Overview
 A full-stack application that processes adverse event reports using AI/NLP techniques. The system extracts structured data from medical reports and provides a user-friendly interface for regulatory compliance.
 
+## Live Demo
+- Backend (PythonAnywhere): https://asj234.pythonanywhere.com
+- API base (PythonAnywhere): https://asj234.pythonanywhere.com/api
+- Admin dashboard (PythonAnywhere) : https://asj234.pythonanywhere.com/admin
+- Frontend (Vercel): https://software-intern-ai-project.vercel.app
+  - Set `REACT_APP_API_URL=https://asj234.pythonanywhere.com/api` in Vercel Environment Variables (and in `frontend/.env` for local builds).
+
 ## Assignment Requirements
 
 ### Part 1: Backend (Python - Django REST Framework) ✅ COMPLETED
@@ -95,7 +102,7 @@ Optionally, create a `.env` file in `frontend/` for the API base URL (defaults t
 REACT_APP_API_URL=http://localhost:8000/api
 ```
 
-### Backend Setup
+### Backend Setup (Local)
 1. **Navigate to backend directory**:
    ```bash
    cd backend
@@ -130,7 +137,7 @@ REACT_APP_API_URL=http://localhost:8000/api
    ```
    Follow prompts to set your own credentials, then use them at `/admin`.
 
-### Frontend Setup
+### Frontend Setup (Local)
 1. **Navigate to frontend directory**:
    ```bash
    cd frontend
@@ -146,6 +153,67 @@ REACT_APP_API_URL=http://localhost:8000/api
    npm start
    ```
    Application will open at: http://localhost:3000
+   
+   Optional: create `frontend/.env` for local prod-like API endpoint
+   ```env
+   REACT_APP_API_URL=https://asj234.pythonanywhere.com/api
+   ```
+
+## Deployment (PythonAnywhere + Vercel)
+
+### Backend on PythonAnywhere
+1. Create a new Web App (Manual configuration) on PythonAnywhere.
+2. Set Python version to 3.12.
+3. In the virtualenv, install deps:
+   ```bash
+   pip install -r /home/<username>/Software-Intern-AI-Project/backend/requirements.txt
+   ```
+4. WSGI config: point to Django wsgi module `backend/regulatory_assistant/wsgi.py`.
+   Example in the WSGI file:
+   ```python
+   import sys, os
+   project_path = '/home/<username>/Software-Intern-AI-Project/backend'
+   if project_path not in sys.path:
+       sys.path.append(project_path)
+   os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'regulatory_assistant.settings')
+   from django.core.wsgi import get_wsgi_application
+   application = get_wsgi_application()
+   ```
+5. Collect static files in a Bash console:
+   ```bash
+   cd /home/<username>/Software-Intern-AI-Project/backend
+   python manage.py collectstatic --noinput
+   ```
+6. Environment variables (PythonAnywhere Web app → Environment):
+   - `SECRET_KEY` (secure value)
+   - `DEBUG=False`
+   - `ALLOWED_HOSTS=asj234.pythonanywhere.com`
+   - Optionally: `CSRF_TRUSTED_ORIGINS=https://asj234.pythonanywhere.com,https://<your-vercel-app>.vercel.app`
+7. Reload the web app. Visit `https://asj234.pythonanywhere.com/admin`.
+
+### Frontend on Vercel
+1. Import the GitHub repo into Vercel.
+2. Root Directory: `frontend`
+3. Build Command: `npm run build`
+4. Output Directory: `build`
+5. Environment Variable:
+   - `REACT_APP_API_URL=https://asj234.pythonanywhere.com/api`
+6. Deploy. Your site will be available at `https://<your-vercel-app>.vercel.app`.
+
+### CORS/CSRF configuration
+In `backend/regulatory_assistant/settings.py`, ensure:
+```python
+CORS_ALLOWED_ORIGINS = [
+    "https://software-intern-ai-project.vercel.app",
+]
+CSRF_TRUSTED_ORIGINS = [
+    "https://asj234.pythonanywhere.com",
+    "https://software-intern-ai-project.vercel.app",
+]
+ALLOWED_HOSTS = [
+    'localhost', '127.0.0.1', '0.0.0.0', 'asj234.pythonanywhere.com'
+]
+```
 
 If your backend runs elsewhere, set `REACT_APP_API_URL` in `frontend/.env` accordingly.
 
