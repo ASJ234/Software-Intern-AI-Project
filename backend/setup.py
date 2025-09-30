@@ -58,13 +58,41 @@ def install_spacy_model():
     """Install spaCy English model"""
     print("\n🔄 Installing spaCy English model...")
     try:
-        subprocess.run([sys.executable, '-m', 'spacy', 'download', 'en_core_web_sm'], 
-                      check=True, capture_output=True)
-        print("✅ spaCy model installed successfully")
+        # If already installed and loadable, skip reinstall
+        import spacy
+        try:
+            spacy.load('en_core_web_sm')
+            print("✅ spaCy model already installed and loadable")
+            return True
+        except Exception:
+            pass
+
+        # Attempt standard downloader first
+        try:
+            subprocess.run([sys.executable, '-m', 'spacy', 'download', 'en_core_web_sm'], 
+                          check=True)
+        except subprocess.CalledProcessError as e:
+            print("⚠️  spaCy downloader failed, trying direct wheel install for en_core_web_sm==3.7.1 ...")
+            # Fallback to exact wheel compatible with spaCy 3.7.x
+            wheel_url = (
+                'https://github.com/explosion/spacy-models/releases/download/'
+                'en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl'
+            )
+            subprocess.run([sys.executable, '-m', 'pip', 'install', wheel_url], check=True)
+
+        # Verify load
+        try:
+            spacy.load('en_core_web_sm')
+            print("✅ spaCy model installed and verified")
+            return True
+        except Exception as e:
+            print(f"❌ spaCy model installation appears to have failed: {e}")
+            print("ℹ️  The app will continue using fallback regex patterns.")
+            return True  # Not critical for basic functionality
+    except Exception as e:
+        print(f"⚠️  spaCy model step encountered an unexpected error: {e}")
+        print("ℹ️  The app will continue using fallback regex patterns.")
         return True
-    except subprocess.CalledProcessError:
-        print("⚠️  spaCy model installation failed. The app will use fallback regex patterns.")
-        return True  # Not critical for basic functionality
 
 def main():
     """Main setup function"""
